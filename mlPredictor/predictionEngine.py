@@ -44,9 +44,9 @@ import time
 # Load Train and Test CSV
 def train_model():
 
-	headerNames = ["id","Gender","age","hypertension","heart_disease","ever_married","work_type",
-               "Residence_type","avg_glucose_level","bmi","smoking_status","stroke"]
-	prefix = "./dataset/"
+	headerNames = ["id","gender","age","hypertension","heart_disease","ever_married","work_type",
+               "residence_type","avg_glucose_level","bmi","smoking_status","stroke"]
+	prefix = "../dataset/"
 
 	# ID cannot be used for prediction 
 	# hence setting index_col = 0 takes care of removing ID field from dataset in both train and test dataframes.
@@ -70,20 +70,20 @@ def train_model():
 	# In[5]:
 
 
-	# Gender, Age, BMI to heart rate data
-	headerNames = ["Gender","Age","Height","Weight","HR_max"]
-	prefix = "./dataset/"
+	# gender, age, BMI to heart rate data
+	headerNames = ["gender","age","height","weight","hr_max"]
+	
 
 	# ID cannot be used for prediction 
 	# hence setting index_col = 0 takes care of removing ID field from dataset in both train and test dataframes.
 	hrratetraindf = pd.read_csv(prefix + "demog-max-hrrate.csv", header=None, delim_whitespace=False,  names=headerNames, ) #index_col=0, 
-	hrratetraindf['Weight'] = hrratetraindf['Weight'].astype(float)
+	hrratetraindf['weight'] = hrratetraindf['weight'].astype(float)
 
-	hrratetraindf['Height'] = hrratetraindf['Height'].astype(float)
-	hrratetraindf.loc[hrratetraindf['Height'] > 10, 'Height'] = hrratetraindf['Height']/100
+	hrratetraindf['height'] = hrratetraindf['height'].astype(float)
+	hrratetraindf.loc[hrratetraindf['height'] > 10, 'height'] = hrratetraindf['height']/100
 
 
-	hrratetraindf['BMI'] = hrratetraindf['Weight'] / (hrratetraindf['Height'] * hrratetraindf['Height'])
+	hrratetraindf['BMI'] = hrratetraindf['weight'] / (hrratetraindf['height'] * hrratetraindf['height'])
 
 	print(hrratetraindf.shape)
 	hrratetraindf.head(100)
@@ -93,10 +93,10 @@ def train_model():
 
 
 	# Set of Unique Values for stroke - it is a binary classification problem
-	print(traindf['Gender'].unique())
+	print(traindf['gender'].unique())
 	print(traindf['ever_married'].unique())
 	print(traindf['work_type'].unique())
-	print(traindf['Residence_type'].unique())
+	print(traindf['residence_type'].unique())
 	print(traindf['smoking_status'].unique())
 	print(traindf['stroke'].unique())
 
@@ -137,22 +137,22 @@ def train_model():
 	# In[10]:
 
 
-	# Feature Engineering - Convert Categorical Data to Numeric > Gender
-	# convert Gender to numeric
+	# Feature Engineering - Convert Categorical Data to Numeric > gender
+	# convert gender to numeric
 
 	#Train Data
-	traindf['Gender_numeric']  = 0.0 # default value
-	traindf.loc[traindf['Gender'] == 'Male', 'Gender_numeric'] = 1.0
-	traindf.loc[traindf['Gender'] == 'Female', 'Gender_numeric'] = 2.0
-	traindf.loc[traindf['Gender'] == 'Other', 'Gender_numeric'] = 3.0
-	traindf = traindf.drop('Gender', axis=1)
+	traindf['gender_numeric']  = 0.0 # default value
+	traindf.loc[traindf['gender'] == 'Male', 'gender_numeric'] = 1.0
+	traindf.loc[traindf['gender'] == 'Female', 'gender_numeric'] = 2.0
+	traindf.loc[traindf['gender'] == 'Other', 'gender_numeric'] = 3.0
+	traindf = traindf.drop('gender', axis=1)
 
 	#Test Data
-	testdf['Gender_numeric']  = 0.0 # default value
-	testdf.loc[testdf['Gender'] == 'Male', 'Gender_numeric'] = 1.0
-	testdf.loc[testdf['Gender'] == 'Female', 'Gender_numeric'] = 2.0
-	testdf.loc[testdf['Gender'] == 'Other', 'Gender_numeric'] = 3.0
-	testdf = testdf.drop('Gender', axis=1)
+	testdf['gender_numeric']  = 0.0 # default value
+	testdf.loc[testdf['gender'] == 'Male', 'gender_numeric'] = 1.0
+	testdf.loc[testdf['gender'] == 'Female', 'gender_numeric'] = 2.0
+	testdf.loc[testdf['gender'] == 'Other', 'gender_numeric'] = 3.0
+	testdf = testdf.drop('gender', axis=1)
 
 
 	# In[11]:
@@ -203,21 +203,21 @@ def train_model():
 	# In[13]:
 
 
-	# Feature Engineering - Convert Categorical Data to Numeric > Residence_type
-	# convert Residence_type to numeric
+	# Feature Engineering - Convert Categorical Data to Numeric > residence_type
+	# convert residence_type to numeric
 	#['Rural' 'Urban']
 
 	#Train Data
-	traindf['Residence_type_numeric']  = 0.0 # default value
-	traindf.loc[traindf['Residence_type'] == 'Rural', 'Residence_type_numeric'] = 1.0
-	traindf.loc[traindf['Residence_type'] == 'Urban', 'Residence_type_numeric'] = 2.0
-	traindf = traindf.drop('Residence_type', axis=1)
+	traindf['residence_type_numeric']  = 0.0 # default value
+	traindf.loc[traindf['residence_type'] == 'Rural', 'residence_type_numeric'] = 1.0
+	traindf.loc[traindf['residence_type'] == 'Urban', 'residence_type_numeric'] = 2.0
+	traindf = traindf.drop('residence_type', axis=1)
 
 	#Test Data
-	testdf['Residence_type_numeric']  = 0.0 # default value
-	testdf.loc[testdf['Residence_type'] == 'Rural', 'Residence_type_numeric'] = 1.0
-	testdf.loc[testdf['Residence_type'] == 'Urban', 'Residence_type_numeric'] = 2.0
-	testdf = testdf.drop('Residence_type', axis=1)
+	testdf['residence_type_numeric']  = 0.0 # default value
+	testdf.loc[testdf['residence_type'] == 'Rural', 'residence_type_numeric'] = 1.0
+	testdf.loc[testdf['residence_type'] == 'Urban', 'residence_type_numeric'] = 2.0
+	testdf = testdf.drop('residence_type', axis=1)
 
 
 	# In[14]:
@@ -288,11 +288,11 @@ def train_model():
 
 	#drop based on very low positive or negative correlation
 
-	#traindf = traindf.drop('Residence_type_numeric', axis=1)
-	#testdf = testdf.drop('Residence_type_numeric', axis=1)
+	#traindf = traindf.drop('residence_type_numeric', axis=1)
+	#testdf = testdf.drop('residence_type_numeric', axis=1)
 
-	#traindf = traindf.drop('Gender_numeric', axis=1)
-	#testdf = testdf.drop('Gender_numeric', axis=1)
+	#traindf = traindf.drop('gender_numeric', axis=1)
+	#testdf = testdf.drop('gender_numeric', axis=1)
 
 
 	#traindf = traindf.drop('smoking_status_numeric', axis=1)
@@ -388,21 +388,21 @@ def train_model():
 
 	## Prediction model 
 	print(hrratetraindf.columns)
-	hr_train_features = hrratetraindf.loc[:, hrratetraindf.columns != 'HR_max']
-	hr_train_features= hr_train_features.drop('Height',axis=1)
-	hr_train_features= hr_train_features.drop('Weight',axis=1)
+	hr_train_features = hrratetraindf.loc[:, hrratetraindf.columns != 'hr_max']
+	hr_train_features= hr_train_features.drop('height',axis=1)
+	hr_train_features= hr_train_features.drop('weight',axis=1)
 
-	hr_train_features['Gender'] = hr_train_features['Gender'].astype(float)
-	hr_train_features['Age'] = hr_train_features['Age'].astype(float)
+	hr_train_features['gender'] = hr_train_features['gender'].astype(float)
+	hr_train_features['age'] = hr_train_features['age'].astype(float)
 
 	print(hr_train_features.columns)
 	print(hr_train_features.head(10))
 	# extract label from training set - Approved
-	hr_train_label = hrratetraindf.loc[:, hrratetraindf.columns == 'HR_max']
-	hr_train_label['HR_max'] = hr_train_label['HR_max'].astype(float)
+	hr_train_label = hrratetraindf.loc[:, hrratetraindf.columns == 'hr_max']
+	hr_train_label['hr_max'] = hr_train_label['hr_max'].astype(float)
 	print(hr_train_label.columns)
 	0
-	hr_train_label['HR_max'].fillna(hr_train_label['HR_max'].dropna().mean(), inplace=True)
+	hr_train_label['hr_max'].fillna(hr_train_label['hr_max'].dropna().mean(), inplace=True)
 
 	# check for null valued columns
 	print("Train Data -any null ?? ")
@@ -440,7 +440,7 @@ def train_model():
 
 	hr_train_features= hr_train_features.drop('work_type_numeric', axis=1)
 	hr_train_features= hr_train_features.drop('smoking_status_numeric', axis=1)
-	hr_train_features= hr_train_features.drop('Residence_type_numeric', axis=1)
+	hr_train_features= hr_train_features.drop('residence_type_numeric', axis=1)
 
 	print("hr train ",hr_train_features.columns)
 
@@ -464,7 +464,7 @@ def train_model():
 	hr_test_features= hr_test_features.drop('ever_married_numeric', axis=1)
 	hr_test_features= hr_test_features.drop('work_type_numeric', axis=1)
 	hr_test_features= hr_test_features.drop('smoking_status_numeric', axis=1)
-	hr_test_features= hr_test_features.drop('Residence_type_numeric', axis=1)
+	hr_test_features= hr_test_features.drop('residence_type_numeric', axis=1)
 
 
 
@@ -546,9 +546,9 @@ def predict(model, input_dict):
 	#outputdf.to_csv("output/output_rf"+str(time.time())+".csv", sep=",", index=False)
 
 if __name__=="__main__":
-	'''input ={'age':'30.0', 'hypertension': '0.0', 'heart_disease':'0.0', 'bmi':'26.5', 'Gender_numeric':1.0,
-   	'ever_married_numeric':'1.0', 'work_type_numeric':'1.0', 'Residence_type_numeric':'1.0',
+	'''input ={'age':'30.0', 'hypertension': '0.0', 'heart_disease':'0.0', 'bmi':'26.5', 'gender_numeric':1.0,
+   	'ever_married_numeric':'1.0', 'work_type_numeric':'1.0', 'residence_type_numeric':'1.0',
    	'smoking_status_numeric':'0.0', 'hr':'120.4'}'''
-	input = {'age':30.0, 'hypertension': 0.0, 'heart_disease':0.0, 'bmi':26.5, 'Gender_numeric':1.0,'ever_married_numeric':1.0, 'work_type_numeric':1.0, 'Residence_type_numeric':1.0,'smoking_status_numeric':0.0, 'hr':120.4}
+	input = {'age':30.0, 'hypertension': 0.0, 'heart_disease':0.0, 'bmi':26.5, 'gender_numeric':1.0,'ever_married_numeric':1.0, 'work_type_numeric':1.0, 'residence_type_numeric':1.0,'smoking_status_numeric':0.0, 'hr':120.4}
 	model = train_model()
 	predict(model, input)
