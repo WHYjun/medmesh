@@ -94,6 +94,7 @@ def get_percentage(username):
     stroke_probability =  predictionEngine.predict(model, req) # requests.post('url', json=req)
     print("stroke_probability >> ", stroke_probability)
     req['stroke_probability'] = stroke_probability
+    req['visit'] = getVisitType(req);
     return jsonify(req)
 
 
@@ -106,6 +107,14 @@ def calculate_hr(heart_rates):
     avg = total/len(heart_rates['dataset'])
     return round(avg, 2)
 
+
+def getVisitType(req):
+    if req['stroke_probability']  < 0.4:
+        return "Primary Care"
+    elif req['stroke_probability']  >= 0.4 and req['stroke_probability']  < 0.7:
+        return "Urgent Care"
+    else:
+        return "Emergency Room"
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=int("8080"), debug=True)
