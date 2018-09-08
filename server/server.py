@@ -1,5 +1,5 @@
 import fitbit
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 import logging
 import os
 import requests
@@ -61,6 +61,11 @@ user_data = {
 }
 
 # API
+@app.route('/')
+def hello():
+    return 'hello, world'
+
+
 @app.route('/api/user/<username>', methods=['GET'])
 def get_percentage(username):
     user = user_data.get(username)
