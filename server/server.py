@@ -73,12 +73,18 @@ def get_percentage(username):
     else:
         start = '13:00'
         end = '13:01'
-        heart_rates = fitbit_module.get_heartrate(start=start, end=end)
+        try:
+            heart_rates = fitbit_module.get_heartrate(start=start, end=end)
+            avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
+        except:
+            avg_hr = 80.00
     req = user
-    req['heart_rate'] = calculate_hr(heart_rates['activities-heart-intraday'])
+    req['heart_rate'] = avg_hr
     # percentage = requests.post('url', json=req)
     return jsonify(req)
 
+
+@app.route('/api/insurance/<insurance_name>')
 
 def calculate_hr(heart_rates):
     total = 0
@@ -86,6 +92,7 @@ def calculate_hr(heart_rates):
         total += heart_rate['value']
     avg = total/len(heart_rates['dataset'])
     return round(avg, 2)
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=int("8080"), debug=True)
