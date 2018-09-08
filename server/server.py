@@ -76,7 +76,7 @@ def get_percentage(username):
         try:
             heart_rates = fitbit_module.get_heartrate(start=start, end=end)
             avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
-        except:
+        except Exception as e:
             avg_hr = 80.00
     req = user
     req['heart_rate'] = avg_hr
