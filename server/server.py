@@ -23,6 +23,7 @@ logger.addHandler(file_handler)
 
 # Modules
 from modules import fitbit_module
+from modules import betterdoctor
 
 # MongoDB
 from pymongo import MongoClient
@@ -66,7 +67,7 @@ user_data = {
     }
 }
 
-# API
+
 @app.route('/')
 def hello():
     return 'hello, world'
@@ -91,14 +92,43 @@ def get_percentage(username):
             avg_hr = 80.00
     req = user
     req['heart_rate'] = avg_hr
-    stroke_probability =  predictionEngine.predict(model, req) # requests.post('url', json=req)
+    stroke_probability = predictionEngine.predict(
+        model, req)
     print("stroke_probability >> ", stroke_probability)
     req['stroke_probability'] = stroke_probability
-    req['visit'] = getVisitType(req);
+    req['visit'] = getVisitType(req)
     return jsonify(req)
 
 
-@app.route('/api/insurance/<insurance_name>')
+@app.route('/api/insurance_list', methods=['GET'])
+def get_insurance_list():
+    location = 'pa-philadelphia'
+    insurances = betterdoctor.getInsurances(limit=10)
+    insurance_list = []
+    for insurance in insurances['data']:
+        for plan in insurance['plans']:
+            insurance_list.append({
+                'name': plan['name'],
+                'uid': plan['uid']
+            })
+    return jsonify(insurance_list)
+
+
+@app.route('/api/insurance/<insurance_name>', methods=['GET'])
+def get_insurance(insurance_name):
+    location = 'pa-philadelphia'
+    # uid = None
+    # insurances = betterdoctor.getInsurances()
+    # for insurance in insurances['data']:
+    #     if insurance_name in insurance['uid']:
+    #         uid = insurance['uid']
+    # if not uid:
+    #     return None
+    uid = 'aetna-aetnabasichmo'
+    doctors = betterdoctor.getDoctors(
+        location=location, insurance=uid, limit=3)
+    return jsonify(doctors)
+
 
 def calculate_hr(heart_rates):
     total = 0
@@ -109,14 +139,13 @@ def calculate_hr(heart_rates):
 
 
 def getVisitType(req):
-    if req['stroke_probability']  < 0.4:
+    if req['stroke_probability'] < 0.4:
         return "Primary Care"
-    elif req['stroke_probability']  >= 0.4 and req['stroke_probability']  < 0.7:
+    elif req['stroke_probability'] >= 0.4 and req['stroke_probability'] < 0.7:
         return "Urgent Care"
     else:
         return "Emergency Room"
 
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=int("8080"), debug=True)
-    
-
