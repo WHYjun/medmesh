@@ -7,6 +7,12 @@ import requests
 # App
 from configure import app
 
+# add the mlpred folder
+import sys
+sys.path.insert(0, '../mlPredictor')
+import predictionEngine
+model = predictionEngine.train_model()
+
 # Log
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -85,7 +91,9 @@ def get_percentage(username):
             avg_hr = 80.00
     req = user
     req['heart_rate'] = avg_hr
-    # percentage = requests.post('url', json=req)
+    stroke_probability =  predictionEngine.predict(model, req) # requests.post('url', json=req)
+    print("stroke_probability >> ", stroke_probability)
+    req['stroke_probability'] = stroke_probability
     return jsonify(req)
 
 
@@ -101,3 +109,5 @@ def calculate_hr(heart_rates):
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=int("8080"), debug=True)
+    
+

@@ -292,11 +292,11 @@ def train_model():
 
 	train_features['predicted_hr_max']=hr_model.predict(hr_train_features)
 
-	traindf['hr'] = train_features['predicted_hr_max']
-	traindf.loc[traindf['stroke'] == 0.0, 'hr'] = train_features['predicted_hr_max'] - 70; # normal is less than 120
+	traindf['heart_rate'] = train_features['predicted_hr_max']
+	traindf.loc[traindf['stroke'] == 0.0, 'heart_rate'] = train_features['predicted_hr_max'] - 70; # normal is less than 120
 
 
-	train_features['hr'] = traindf['hr']
+	train_features['heart_rate'] = traindf['heart_rate']
 	train_features = train_features.drop('predicted_hr_max', axis=1)
 	#print(train_features.columns)
 	print(train_features.columns)
@@ -338,8 +338,8 @@ def predict(model, input_dict):
 	print("****************************************************************************************")
 	print("Predicted Output [probability of No Stroke, probability of Stroke]  >>>>>>>>> ",test_pred) # Predicted Values
 	print("****************************************************************************************")
-
-	return test_pred
+	print("test_pred[:,1] >> ",test_pred[:,1][0])
+	return test_pred[:,1][0]
 
 
 '''
@@ -348,7 +348,7 @@ def predict(model, input_dict):
 if __name__=="__main__":
 	'''input ={'age':'30.0', 'hypertension': '0.0', 'heart_disease':'0.0', 'bmi':'26.5', 'gender_numeric':1.0,
    	'ever_married_numeric':'1.0', 'work_type_numeric':'1.0', 'residence_type_numeric':'1.0',
-   	'smoking_status_numeric':'0.0', 'hr':'120.4'}'''
-	input = {'age':30.0, 'hypertension': 0.0, 'heart_disease':0.0, 'bmi':26.5, 'gender_numeric':1.0,'ever_married_numeric':1.0, 'work_type_numeric':1.0, 'residence_type_numeric':1.0,'smoking_status_numeric':0.0, 'hr':220.4}
+   	'smoking_status_numeric':'0.0', 'heart_rate':'120.4'}'''
+	input = {'age':30.0, 'hypertension': 0.0, 'heart_disease':0.0, 'bmi':26.5, 'gender_numeric':1.0,'ever_married_numeric':1.0, 'work_type_numeric':1.0, 'residence_type_numeric':1.0,'smoking_status_numeric':0.0, 'heart_rate':220.4}
 	model = train_model()
 	predict(model, input)
