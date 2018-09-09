@@ -126,7 +126,9 @@ def get_percentage(username):
         "user_id": "2",
         "bot_id": "1",
         "module_id": "3",
-        "message": req['visit']
+        "message": req['visit'],
+        "stroke_probability": stroke_probability
+
     }
     return jsonify(res)
 
