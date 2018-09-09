@@ -76,7 +76,7 @@ def register():
 @app.route('/api/signup', methods=['POST'])
 def signup():
 
-	args = request.args
+	args = request.form
 	print (args)
 
 	username = args['username']
