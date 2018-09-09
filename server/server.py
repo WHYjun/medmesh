@@ -84,7 +84,15 @@ def signup():
 	pw = args['password']
 	insurance = args['insurance']
 	age = args['age']
-	db.user.insert({'username': username,'password': pw,'insurance': insurance,'age': age})
+	gender = args['gender']
+	married = args['married']
+	hypertension = args['hypertension']
+	heartdisease = args['heartdisease']
+	smoking = args['smoking']
+	worktype = args['worktype']
+	residencetype = args['residencetype']
+	print("captured inputs.. about to insert into db")
+	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'workingtype': workingtype, 'residencetype': residencetype })
 	
 	return Response(status=200)
 
