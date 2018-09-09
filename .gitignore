@@ -112,3 +112,6 @@ logs/
 # windows
 test.env
 win-test.bat
+
+# image
+.png

@@ -12,8 +12,8 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="css/register.css">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/register.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/register.css')}}">
 </head>
 
 <body>
@@ -50,15 +50,38 @@
                         <label class="radio-inline"><input type="radio" name="optradio">Other</label>
                     </div>
                     <div class="form-group label_001">
-                        <label class=""> Gender: </label>
-                        <label class="radio-inline"><input type="radio" name="optradio">Male</label>
-                        <label class="radio-inline"><input type="radio" name="optradio">Female</label>
-                        <label class="radio-inline"><input type="radio" name="optradio">Other</label>
+                        <label class=""> Ever Married: </label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Yes</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">No</label>
                     </div>
                     <div class="form-group label_001">
                         <label class=""> HyperTension: </label>
                         <label class="radio-inline"><input type="radio" name="optradio">Yes</label>
                         <label class="radio-inline"><input type="radio" name="optradio">No</label>
+                    </div>
+                    <div class="form-group label_001">
+                        <label class=""> Heart Disease: </label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Yes</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">No</label>
+                    </div>
+                    <div class="form-group label_001">
+                        <label class=""> Smoking: </label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Never</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Formerly</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Smokes</label>
+                    </div>
+                    <div class="form-group label_001">
+                        <label class=""> Work Type: </label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Children</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Private</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Never</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Self-Employed</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Government</label>
+                    </div>
+                    <div class="form-group label_001">
+                        <label class=""> Residence Type: </label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Rural</label>
+                        <label class="radio-inline"><input type="radio" name="optradio">Urban</label>
                     </div>
                     <div class="form-group">
                         <input type="submit" class="btn btn-success" value="submit" style="border-radius:0px;">
@@ -70,7 +93,9 @@
                     <a href="#" style="color: white; font-size: 15px; float: right; margin-right: 10px;"> Register </a>
                 </form>
 
-                <link href="https://snatchbot.me/sdk/webchat.css" rel="stylesheet" type="text/css"><script src="https://snatchbot.me/sdk/webchat.min.js"></script><script> Init('?botID=28729&appID=ZccN1sRvfz9TEuRFJmMA', 600, 600, 'https://dvgpba5hywmpo.cloudfront.net/media/image/iITFbbXk00IS9WXgdtirDD3In', 'bubble', '#00AFF0', 90, 90, 62.99999999999999, '', '0', '#FFFFFF', ); /* for authentication of its users, you can define your userID (add &userID={login}) */ </script>
+                <link href="https://snatchbot.me/sdk/webchat.css" rel="stylesheet" type="text/css">
+                <script src="https://snatchbot.me/sdk/webchat.min.js"></script>
+                <script> Init('?botID=28729&appID=ZccN1sRvfz9TEuRFJmMA', 600, 600, 'https://dvgpba5hywmpo.cloudfront.net/media/image/iITFbbXk00IS9WXgdtirDD3In', 'bubble', '#00AFF0', 90, 90, 62.99999999999999, '', '0', '#FFFFFF'); /* for authentication of its users, you can define your userID (add &userID={login}) */ </script>
 
             </div>
         </div>
