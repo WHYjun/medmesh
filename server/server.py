@@ -93,7 +93,7 @@ def signup():
 	residencetype = args['residencetype']
 	print("captured inputs.. about to insert into db")
 	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'workingtype': workingtype, 'residencetype': residencetype })
-	
+
 	return Response(status=200)
 
 
@@ -201,8 +201,8 @@ def get_insurance_list():
     return jsonify(insurance_list)
 
 
-@app.route('/api/insurance/<insurance_name>', methods=['POST'])
-def get_insurance(insurance_name):
+@app.route('/api/insurance', methods=['POST'])
+def get_insurance():
     location = 'pa-philadelphia'
     # uid = None
     # insurances = betterdoctor.getInsurances()
@@ -214,7 +214,15 @@ def get_insurance(insurance_name):
     uid = 'aetna-aetnabasichmo'
     doctors = betterdoctor.getDoctors(
         location=location, insurance=uid, limit=3)
-    return jsonify(doctors)
+    message = 'doctor1, doctor2, doctor3'
+    res = {
+        "user_id": "2",
+        "bot_id": "1",
+        "module_id": "3",
+        "message": message
+    }
+    return jsonify(res)
+    # return jsonify(doctors)
 
 
 def calculate_hr(heart_rates):
