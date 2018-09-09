@@ -91,8 +91,10 @@ def signup():
 	smoking = args['smoking']
 	worktype = args['worktype']
 	residencetype = args['residencetype']
+	state = args['state']
+	city = args['city']
 	print("captured inputs.. about to insert into db")
-	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'workingtype': workingtype, 'residencetype': residencetype })
+	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
 	
 	return Response(status=200)
 
