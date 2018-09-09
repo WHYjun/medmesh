@@ -70,12 +70,12 @@ user_data = {
 }
 
 '''
-req >>  {'_id': ObjectId('5b94e647c5aef53ea07e43a5'), 
-'username': 'u33', 'password': 'sdsd', 'insurance': 'uhc', 
-'age': '12', 'bmi': 304687.5, 'height': 0.016, 'weight': '78', 
-'gender_numeric': '1.0', 'ever_married_numeric': '1.0', 'hypertension': '1.0', 
-'heart_disease': '1.0', 'smoking_status_numeric': '1.0', 'work_type_numeric': '2.0', 
-'residence_type_numeric': '2.0', 'state': 'ny', 'city': 'stonybrrok', 
+req >>  {'_id': ObjectId('5b94e647c5aef53ea07e43a5'),
+'username': 'u33', 'password': 'sdsd', 'insurance': 'uhc',
+'age': '12', 'bmi': 304687.5, 'height': 0.016, 'weight': '78',
+'gender_numeric': '1.0', 'ever_married_numeric': '1.0', 'hypertension': '1.0',
+'heart_disease': '1.0', 'smoking_status_numeric': '1.0', 'work_type_numeric': '2.0',
+'residence_type_numeric': '2.0', 'state': 'ny', 'city': 'stonybrrok',
 'datetime': datetime.datetime(2018, 9, 9, 5, 22, 15, 200000), 'heart_rate': 80.0}
 '''
 
@@ -132,7 +132,7 @@ def get_judges():
         avg_hr = 80.0
     req = user
     req['heart_rate'] = avg_hr
-    
+
     #request json sync
     del req['_id']
     del req['username']
@@ -154,7 +154,7 @@ def get_judges():
     hospital = getVisitType(req)
     if hospital == 'Heart Healthy':
         hospital = 'relax and no medical help needed'
-    message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary Care, Urgent Care, Emergency Room, Nothing)'.format(
+    message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary care, Urgent care, Emergency room, Nothing)'.format(
         round(stroke_probability, 2),
         hospital
     )
@@ -178,18 +178,12 @@ def get_percentage(username):
         # TODO: Get data from real cases
         pass
     else:
-        start = '13:00'
-        end = '13:01'
-        try:
-            heart_rates = fitbit_module.get_heartrate(start=start, end=end)
-            avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
-        except Exception as e:
-            if username == 'Charlie':
-                avg_hr = 140.00
-            elif username == 'Bob':
-                avg_hr = 120.00
-            else:
-                avg_hr = 90.00
+        if username == 'Charlie':
+            avg_hr = 140.00
+        elif username == 'Bob':
+            avg_hr = 120.00
+        else:
+            avg_hr = 90.00
     req = user
     req['heart_rate'] = avg_hr
     #clear it for every request
@@ -202,7 +196,7 @@ def get_percentage(username):
     hospital = getVisitType(req)
     if hospital == 'Heart Healthy':
         hospital = 'relax and no medical help needed'
-    message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary Care, Urgent Care, Emergency Room, Nothing)'.format(
+    message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary care, Urgent care, Emergency room, Nothing)'.format(
         round(stroke_probability, 2),
         hospital
     )
@@ -276,7 +270,7 @@ def get_insurance():
         })
     map_base = 'https://www.google.com/maps/place/'
     google_map = map_base + doctor_list[0]['street'].replace(' ', '+') + '+' + doctor_list[0]['city']
-    message = 'Here is the nearest doctor who covers your insurance network.\n Bio: {} \nPhone Number: {} \nAddress: {} \nGoogle Map: {}'.format(
+    message = 'Here is the nearest doctor who covers your insurance network.\nBio: {} \nPhone Number: {} \nAddress: {} \nGoogle Map: {}'.format(
         doctor_list[0]['bio'],
         doctor_list[0]['phone'],
         doctor_list[0]['street'] + ', ' + doctor_list[0]['name'],
