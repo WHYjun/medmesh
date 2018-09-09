@@ -83,9 +83,9 @@ def signup():
     insurance = args['insurance']
     age = args['age']
     print(age)
-    height = args['height']/100
+    height = float(args['height'])/100
     weight = args['weight']
-    bmi = weight/(height)**2
+    bmi = float(weight)/(float(height))**2
     print(weight)
     gender = args['gender']
     married = args['married']
