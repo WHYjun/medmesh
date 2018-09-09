@@ -114,11 +114,18 @@ def get_judges():
     stroke_probability = predictionEngine.predict(
         model, req)
     req['stroke_probability'] = stroke_probability
+    hospital = getVisitType(req)
+    if hospital == 'Heart Healthy':
+        hospital = 'relax and no medical help needed'
+    message = 'OK, here they are.\n Based on your heart rate in past month, the stroke probability is {}.\n We recommend to go {}. \n Where would you like to go?'.format(
+        round(stroke_probability, 2),
+        hospital
+    )
     res = {
         "user_id": "2",
         "bot_id": "1",
         "module_id": "3",
-        "message": getVisitType(req),
+        "message": message,
         "stroke_probability": stroke_probability
     }
     return jsonify(res)
@@ -151,15 +158,22 @@ def get_percentage(username):
     #clear it for every request
     if 'stroke_probability' in req:
     	del req['stroke_probability']
-    
+
     stroke_probability = predictionEngine.predict(
         model, req)
     req['stroke_probability'] = stroke_probability
+    hospital = getVisitType(req)
+    if hospital == 'Heart Healthy':
+        hospital = 'relax and no medical help needed'
+    message = 'OK, here they are.\n Based on your heart rate in past month, the stroke probability is {}.\n We recommend to go {}. \n Where would you like to go?'.format(
+        round(stroke_probability, 2),
+        hospital
+    )
     res = {
         "user_id": "2",
         "bot_id": "1",
         "module_id": "3",
-        "message": getVisitType(req),
+        "message": message,
         "stroke_probability": stroke_probability
     }
     return jsonify(res)
@@ -179,7 +193,7 @@ def get_insurance_list():
     return jsonify(insurance_list)
 
 
-@app.route('/api/insurance/<insurance_name>', methods=['GET'])
+@app.route('/api/insurance/<insurance_name>', methods=['POST'])
 def get_insurance(insurance_name):
     location = 'pa-philadelphia'
     # uid = None
