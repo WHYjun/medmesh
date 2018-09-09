@@ -1,5 +1,5 @@
 import fitbit
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 import logging
 import os
 import requests
@@ -69,13 +69,33 @@ user_data = {
 
 
 @app.route('/')
-def hello():
-    return 'hello, world'
+def register():
+    return render_template('register.html')
 
 
-@app.route('/api/user/<username>', methods=['GET'])
-def get_percentage(username):
-    user = user_data.get(username)
+
+
+
+
+@app.route('/api/signup', methods=['POST'])
+def signup():
+    username = request.form['username']
+    pw = request.form['password']
+    insurance = request.form['insurance']
+    age = request.form['']
+    db.user.insert({'username': username,
+                    'password': pw,
+                    'insurance': insurance,
+                    'birthday': birthday})
+    response = Response()
+    response.status_code = 200
+    return response.json()
+
+
+# @app.route('/api/user/<username>', methods=['GET'])
+@app.route('/api/user', methods=['POST'])
+def get_percentage():
+    user = user_data.get('Amy')
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
@@ -97,7 +117,13 @@ def get_percentage(username):
     print("stroke_probability >> ", stroke_probability)
     req['stroke_probability'] = stroke_probability
     req['visit'] = getVisitType(req)
-    return jsonify(req)
+    res = {
+        "user_id": "2",
+        "bot_id": "1",
+        "module_id": "3",
+        "message": req['visit']
+    }
+    return jsonify(res)
 
 
 @app.route('/api/insurance_list', methods=['GET'])

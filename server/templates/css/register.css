@@ -1,0 +1,69 @@
+body{
+	background-image:url(https://wallpapertag.com/wallpaper/full/c/a/a/157415-simplistic-wallpapers-1920x1080-lockscreen.jpg)
+}
+#login-name{
+font-size: 65px;
+font-family: arabic typesetting;
+border-bottom-style: ridge;
+color:white;
+
+}
+#login{
+background-color:rgba(13,13,13,0.2);
+min-height:700px;
+padding: 40px 80px 40px 80px;
+box-shadow: -10px -10px 9px #33cc33;
+
+}
+.user{
+font-size: 29px;
+
+font-family: arabic typesetting;
+
+color: white;
+
+
+
+
+
+}
+
+#iconn{
+
+background-color: #5cb85c;
+border-color: #4cae4c;
+color: white;
+
+}
+#iconn1{
+
+background-color: #5cb85c;
+border-color: #4cae4c;
+color: white;
+
+}
+
+#text1{
+
+	border-radius: 0;
+	height: 40px;
+}
+#text2{
+
+	border-radius: 0;
+	height: 40px;
+}
+
+.btn{
+	width: 50%;
+	float: left;
+	height: 40px;
+	font-size: 18px;
+}
+
+.label_001{
+
+	font-size: 18px;
+	color: white;
+	font-style: italic;
+}
