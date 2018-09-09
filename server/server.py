@@ -79,6 +79,7 @@ req >>  {'_id': ObjectId('5b94e647c5aef53ea07e43a5'),
 'datetime': datetime.datetime(2018, 9, 9, 5, 22, 15, 200000), 'heart_rate': 80.0}
 '''
 
+
 @app.route('/')
 def register():
     return render_template('register.html')
@@ -87,20 +88,15 @@ def register():
 @app.route('/api/signup', methods=['POST'])
 def signup():
     args = request.form
-    print (args)
     username = args['username']
-    print(username)
     pw = args['password']
     insurance = args['insurance']
     age = args['age']
-    print(age)
     height = float(args['height'])/100
     weight = args['weight']
     bmi = float(weight)/(float(height))**2
-    print(weight)
     gender = args['gender']
     married = args['married']
-    print(married)
     hypertension = args['hypertension']
     heartdisease = args['heartdisease']
     smoking = args['smoking']
@@ -109,16 +105,19 @@ def signup():
     state = args['state']
     city = args['city']
     dt = datetime.datetime.now()
-    print(city)
     print("captured inputs.. about to insert into db")
-    db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'bmi': bmi, 'height':height, 'weight':weight, 'gender_numeric': gender,'ever_married_numeric': married, 'hypertension': hypertension,'heart_disease': heartdisease, 'smoking_status_numeric': smoking,'work_type_numeric': worktype, 'residence_type_numeric': residencetype, 'state':state, 'city':city, 'datetime': dt })
-
+    db.user.insert({'username': username, 'password': pw, 'insurance': insurance, 'age': age,
+                    'bmi': bmi, 'height': height, 'weight': weight, 'gender_numeric': gender,
+                    'ever_married_numeric': married, 'hypertension': hypertension,
+                    'heart_disease': heartdisease, 'smoking_status_numeric': smoking,
+                    'work_type_numeric': worktype, 'residence_type_numeric': residencetype,
+                    'state': state, 'city': city, 'datetime': dt})
     return render_template('homepage.html')
-    #return Response(status=200)
+
 
 @app.route('/api/user', methods=['POST'])
 def get_judges():
-    user = list(db.user.find().sort('datetime',-1))[0]
+    user = list(db.user.find().sort('datetime', -1))[0]
     print(user)
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
@@ -133,7 +132,7 @@ def get_judges():
     req = user
     req['heart_rate'] = avg_hr
 
-    #request json sync
+    # request json sync
     del req['_id']
     del req['username']
     del req['password']
@@ -144,10 +143,10 @@ def get_judges():
     del req['state']
     del req['datetime']
 
-    print("deletion .. req >> ",req)
-    #clear it for every request
+    print("deletion .. req >> ", req)
+    # clear it for every request
     if 'stroke_probability' in req:
-    	del req['stroke_probability']
+        del req['stroke_probability']
     stroke_probability = predictionEngine.predict(
         model, req)
     req['stroke_probability'] = stroke_probability
@@ -186,18 +185,18 @@ def get_percentage(username):
             avg_hr = 90.00
     req = user
     req['heart_rate'] = avg_hr
-    #clear it for every request
+    # clear it for every request
     if 'stroke_probability' in req:
-    	del req['stroke_probability']
+        del req['stroke_probability']
 
     stroke_probability = predictionEngine.predict(
         model, req)
-    req['stroke_probability'] = stroke_probability
+    req['stroke_probability'] = probability
     hospital = getVisitType(req)
     if hospital == 'Heart Healthy':
         hospital = 'relax and no medical help needed'
     message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary care, Urgent care, Emergency room, Nothing)'.format(
-        round(stroke_probability, 2),
+        round(probability, 2),
         hospital
     )
     res = {
@@ -236,7 +235,7 @@ def get_specialty_list():
 
 @app.route('/api/insurance', methods=['GET', 'POST'])
 def get_insurance():
-    user = list(db.user.find().sort('id',-1))[0]
+    user = list(db.user.find().sort('datetime', -1))[0]
     location = '{}-{}'.format(
         user.get('state').lower(),
         user.get('city').lower()
@@ -269,7 +268,9 @@ def get_insurance():
             'specialty': 'cardiologist'
         })
     map_base = 'https://www.google.com/maps/place/'
-    google_map = map_base + doctor_list[0]['street'].replace(' ', '+') + '+' + doctor_list[0]['city']
+    google_map = map_base + \
+        doctor_list[0]['street'].replace(
+            ' ', '+') + '+' + doctor_list[0]['city']
     message = 'Here is the nearest doctor who covers your insurance network.\nBio: {} \nPhone Number: {} \nAddress: {} \nGoogle Map: {}'.format(
         doctor_list[0]['bio'],
         doctor_list[0]['phone'],
@@ -282,12 +283,7 @@ def get_insurance():
         "module_id": "3",
         "message": message
     }
-    # print(insurance_name)
-    # print(uid)
-    # print(location)
-    # return jsonify(doctors)
     return jsonify(res)
-    # return jsonify(doctors)
 
 
 def calculate_hr(heart_rates):
