@@ -1,3 +1,5 @@
+import bson
+import datetime
 import fitbit
 from flask import Flask, jsonify, render_template, request, Response
 import logging
@@ -97,16 +99,18 @@ def signup():
     residencetype = args['residencetype']
     state = args['state']
     city = args['city']
+    dt = datetime.datetime.now()
     print(city)
     print("captured inputs.. about to insert into db")
-    db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'bmi': bmi, 'height':height, 'weight':weight, 'gender_numeric': gender,'ever_married_numeric': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking_status_numeric': smoking,'worktype_numeric': worktype, 'residencetype_numeric': residencetype,'state':state, 'city':city })
+    db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'bmi': bmi, 'height':height, 'weight':weight, 'gender_numeric': gender,'ever_married_numeric': married, 'hypertension': hypertension,'heart_disease': heartdisease, 'smoking_status_numeric': smoking,'work_type_numeric': worktype, 'residence_type_numeric': residencetype, 'state':state, 'city':city, 'datetime': dt })
 
     return render_template('homepage.html')
     #return Response(status=200)
 
 @app.route('/api/user', methods=['POST'])
 def get_judges():
-    user = list(db.user.find().sort('id',-1))[0]
+    user = list(db.user.find().sort('datetime',-1))[0]
+    print(user)
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
