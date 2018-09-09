@@ -37,10 +37,10 @@ user_data = {
         'hypertension': 1.0,
         'heart_disease': 1.0,
         'bmi': 38.0,
-        'gender_numeric': 2.0,
+        'gender_numeric': 1.0,
         'ever_married_numeric': 1.0,
         'work_type_numeric': 1.0,
-        'residence_type_numeric': 2.0,
+        'residence_type_numeric': 1.0,
         'smoking_status_numeric': 1.0
     },
     'Bob': {
@@ -48,10 +48,10 @@ user_data = {
         'hypertension': 0.0,
         'heart_disease': 1.0,
         'bmi': 41.0,
-        'gender_numeric': 2.0,
+        'gender_numeric': 1.0,
         'ever_married_numeric': 1.0,
         'work_type_numeric': 1.0,
-        'residence_type_numeric': 2.0,
+        'residence_type_numeric': 1.0,
         'smoking_status_numeric': 1.0
     },
     'Charlie': {
@@ -61,7 +61,7 @@ user_data = {
         'bmi': 38.0,
         'gender_numeric': 1.0,
         'ever_married_numeric': 1.0,
-        'work_type_numeric': 2.0,
+        'work_type_numeric': 1.0,
         'residence_type_numeric': 1.0,
         'smoking_status_numeric': 1.0
     }
@@ -75,14 +75,15 @@ def register():
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
+	#print(request.form['username'])
     username = request.form['username']
     pw = request.form['password']
     insurance = request.form['insurance']
-    age = request.form['']
+    age = request.form['age']
     db.user.insert({'username': username,
                     'password': pw,
                     'insurance': insurance,
-                    'birthday': birthday})
+                    'age': age})
     response = Response()
     response.status_code = 200
     return response.json()
@@ -107,15 +108,17 @@ def get_judges():
             avg_hr = 80.0
     req = user
     req['heart_rate'] = avg_hr
+    #clear it for every request
+    if 'stroke_probability' in req:
+    	del req['stroke_probability']
     stroke_probability = predictionEngine.predict(
         model, req)
     req['stroke_probability'] = stroke_probability
-    req['visit'] = getVisitType(req)
     res = {
         "user_id": "2",
         "bot_id": "1",
         "module_id": "3",
-        "message": req['visit'],
+        "message": getVisitType(req),
         "stroke_probability": stroke_probability
     }
     return jsonify(res)
@@ -145,15 +148,18 @@ def get_percentage(username):
                 avg_hr = 90.00
     req = user
     req['heart_rate'] = avg_hr
+    #clear it for every request
+    if 'stroke_probability' in req:
+    	del req['stroke_probability']
+    
     stroke_probability = predictionEngine.predict(
         model, req)
     req['stroke_probability'] = stroke_probability
-    req['visit'] = getVisitType(req)
     res = {
         "user_id": "2",
         "bot_id": "1",
         "module_id": "3",
-        "message": req['visit'],
+        "message": getVisitType(req),
         "stroke_probability": stroke_probability
     }
     return jsonify(res)

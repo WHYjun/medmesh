@@ -228,9 +228,9 @@ def predict(model, input_dict):
 	Pass the reference of the model
 	and a single user data to make the prediction
 	'''
-	#print(input_dict)
+	print(input_dict)
 	testdata = pd.DataFrame([OrderedDict(input_dict)])
-
+	print(testdata)
 	testdata=testdata.drop('gender_numeric',axis=1)
 	testdata=testdata.drop('smoking_status_numeric',axis=1)
 	testdata=testdata.drop('ever_married_numeric',axis=1)
