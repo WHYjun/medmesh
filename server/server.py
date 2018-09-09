@@ -69,6 +69,15 @@ user_data = {
     }
 }
 
+'''
+req >>  {'_id': ObjectId('5b94e647c5aef53ea07e43a5'), 
+'username': 'u33', 'password': 'sdsd', 'insurance': 'uhc', 
+'age': '12', 'bmi': 304687.5, 'height': 0.016, 'weight': '78', 
+'gender_numeric': '1.0', 'ever_married_numeric': '1.0', 'hypertension': '1.0', 
+'heart_disease': '1.0', 'smoking_status_numeric': '1.0', 'work_type_numeric': '2.0', 
+'residence_type_numeric': '2.0', 'state': 'ny', 'city': 'stonybrrok', 
+'datetime': datetime.datetime(2018, 9, 9, 5, 22, 15, 200000), 'heart_rate': 80.0}
+'''
 
 @app.route('/')
 def register():
@@ -123,6 +132,19 @@ def get_judges():
         avg_hr = 80.0
     req = user
     req['heart_rate'] = avg_hr
+    
+    #request json sync
+    del req['_id']
+    del req['username']
+    del req['password']
+    del req['insurance']
+    del req['height']
+    del req['weight']
+    del req['city']
+    del req['state']
+    del req['datetime']
+
+    print("deletion .. req >> ",req)
     #clear it for every request
     if 'stroke_probability' in req:
     	del req['stroke_probability']
