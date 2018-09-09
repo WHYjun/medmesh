@@ -84,8 +84,13 @@ def signup():
 	pw = args['password']
 	insurance = args['insurance']
 	age = args['age']
+	print(age)
+	height = args['height']
+	weight = args['weight']
+	print(weight)
 	gender = args['gender']
 	married = args['married']
+	print(married)
 	hypertension = args['hypertension']
 	heartdisease = args['heartdisease']
 	smoking = args['smoking']
@@ -93,11 +98,11 @@ def signup():
 	residencetype = args['residencetype']
 	state = args['state']
 	city = args['city']
+	print(city)
 	print("captured inputs.. about to insert into db")
-	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
+	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'height':height, 'weight':weight, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
 
 	return Response(status=200)
-
 
 @app.route('/api/user', methods=['POST'])
 def get_judges():
