@@ -83,8 +83,9 @@ def signup():
     insurance = args['insurance']
     age = args['age']
     print(age)
-    height = args['height']
+    height = args['height']/100
     weight = args['weight']
+    bmi = weight/(height)**2
     print(weight)
     gender = args['gender']
     married = args['married']
@@ -98,7 +99,7 @@ def signup():
     city = args['city']
     print(city)
     print("captured inputs.. about to insert into db")
-    db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'height':height, 'weight':weight, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
+    db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'bmi': bmi, 'height':height, 'weight':weight, 'gender_numeric': gender,'ever_married_numeric': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking_status_numeric': smoking,'worktype_numeric': worktype, 'residencetype_numeric': residencetype,'state':state, 'city':city })
 
     return Response(status=200)
 
@@ -108,17 +109,13 @@ def get_judges():
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
-    if os.environ.get('env') == 'demo':
-        # TODO: Get data from real cases
-        pass
-    else:
-        start = '13:00'
-        end = '13:01'
-        try:
-            heart_rates = fitbit_module.get_heartrate(start=start, end=end)
-            avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
-        except Exception as e:
-            avg_hr = 80.0
+    start = '13:00'
+    end = '13:01'
+    try:
+        heart_rates = fitbit_module.get_heartrate(start=start, end=end)
+        avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
+    except Exception as e:
+        avg_hr = 80.0
     req = user
     req['heart_rate'] = avg_hr
     #clear it for every request
