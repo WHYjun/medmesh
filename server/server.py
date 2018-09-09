@@ -75,18 +75,19 @@ def register():
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
-	#print(request.form['username'])
-    username = request.form['username']
-    pw = request.form['password']
-    insurance = request.form['insurance']
-    age = request.form['age']
-    db.user.insert({'username': username,
-                    'password': pw,
-                    'insurance': insurance,
-                    'age': age})
-    response = Response()
-    response.status_code = 200
-    return response.json()
+
+	args = request.args
+	print (args)
+
+	username = args['username']
+	print(username)
+	pw = args['password']
+	insurance = args['insurance']
+	age = args['age']
+	db.user.insert({'username': username,'password': pw,'insurance': insurance,'age': age})
+	response = Response()
+	response.status_code = 200
+	return response.json()
 
 
 @app.route('/api/user', methods=['POST'])
