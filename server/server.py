@@ -75,38 +75,36 @@ def register():
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
+    args = request.form
+    print (args)
+    username = args['username']
+    print(username)
+    pw = args['password']
+    insurance = args['insurance']
+    age = args['age']
+    print(age)
+    height = args['height']
+    weight = args['weight']
+    print(weight)
+    gender = args['gender']
+    married = args['married']
+    print(married)
+    hypertension = args['hypertension']
+    heartdisease = args['heartdisease']
+    smoking = args['smoking']
+    worktype = args['worktype']
+    residencetype = args['residencetype']
+    state = args['state']
+    city = args['city']
+    print(city)
+    print("captured inputs.. about to insert into db")
+    db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'height':height, 'weight':weight, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
 
-	args = request.form
-	print (args)
-
-	username = args['username']
-	print(username)
-	pw = args['password']
-	insurance = args['insurance']
-	age = args['age']
-	print(age)
-	height = args['height']
-	weight = args['weight']
-	print(weight)
-	gender = args['gender']
-	married = args['married']
-	print(married)
-	hypertension = args['hypertension']
-	heartdisease = args['heartdisease']
-	smoking = args['smoking']
-	worktype = args['worktype']
-	residencetype = args['residencetype']
-	state = args['state']
-	city = args['city']
-	print(city)
-	print("captured inputs.. about to insert into db")
-	db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'height':height, 'weight':weight, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
-
-	return Response(status=200)
+    return Response(status=200)
 
 @app.route('/api/user', methods=['POST'])
 def get_judges():
-    user = user_data.get('Amy')
+    user = list(db.user.find().sort('id',-1))[0]
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
@@ -132,7 +130,7 @@ def get_judges():
     hospital = getVisitType(req)
     if hospital == 'Heart Healthy':
         hospital = 'relax and no medical help needed'
-    message = 'OK, here they are.\n Based on your heart rate in past month, the stroke probability is {}.\n We recommend to go {}. \n Where would you like to go?'.format(
+    message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary Care, Urgent Care, Emergency Room, Nothing)'.format(
         round(stroke_probability, 2),
         hospital
     )
@@ -180,7 +178,7 @@ def get_percentage(username):
     hospital = getVisitType(req)
     if hospital == 'Heart Healthy':
         hospital = 'relax and no medical help needed'
-    message = 'OK, here they are.\n Based on your heart rate in past month, the stroke probability is {}.\n We recommend to go {}. \n Where would you like to go?'.format(
+    message = 'OK, here they are.\nBased on your heart rate in past month, the stroke probability is {}.\nWe recommend to go {}.\nWhere would you like to go?\n(Primary Care, Urgent Care, Emergency Room, Nothing)'.format(
         round(stroke_probability, 2),
         hospital
     )
@@ -196,8 +194,7 @@ def get_percentage(username):
 
 @app.route('/api/insurance_list', methods=['GET'])
 def get_insurance_list():
-    location = 'pa-philadelphia'
-    insurances = betterdoctor.getInsurances(limit=10)
+    insurances = betterdoctor.getInsurances()
     insurance_list = []
     for insurance in insurances['data']:
         for plan in insurance['plans']:
@@ -208,26 +205,69 @@ def get_insurance_list():
     return jsonify(insurance_list)
 
 
-@app.route('/api/insurance', methods=['POST'])
+@app.route('/api/specialty_list', methods=['GET'])
+def get_specialty_list():
+    specialties = betterdoctor.getSpecialties()
+    specialty_list = []
+    for specialty in specialties['data']:
+        specialty_list.append({
+            'uid': specialty['uid']
+        })
+    return jsonify(specialty_list)
+
+
+@app.route('/api/insurance', methods=['GET', 'POST'])
 def get_insurance():
-    location = 'pa-philadelphia'
-    # uid = None
-    # insurances = betterdoctor.getInsurances()
-    # for insurance in insurances['data']:
-    #     if insurance_name in insurance['uid']:
-    #         uid = insurance['uid']
-    # if not uid:
-    #     return None
-    uid = 'aetna-aetnabasichmo'
+    user = list(db.user.find().sort('id',-1))[0]
+    location = '{}-{}'.format(
+        user.get('state').lower(),
+        user.get('city').lower()
+    )
+    insurance_name = user.get('insurance').lower()
+    insurances = betterdoctor.getInsurances()
+    insurance_list = []
+    for insurance in insurances['data']:
+        for plan in insurance['plans']:
+            insurance_list.append({
+                'name': plan['name'],
+                'uid': plan['uid']
+            })
+    for insurance in insurance_list:
+        if insurance_name in insurance['uid']:
+            uid = insurance['uid']
+    if not uid:
+        uid = 'aetna-aetnabasichmo'
     doctors = betterdoctor.getDoctors(
-        location=location, insurance=uid, limit=3)
-    message = 'doctor1, doctor2, doctor3'
+        location=location, insurance=uid, specialty='cardiologist', limit=3
+    )
+    doctor_list = []
+    for doctor in doctors['data']:
+        doctor_list.append({
+            'phone': doctor['practices'][0]['phones'][0]['number'],
+            'street': doctor['practices'][0]['visit_address']['street'],
+            'city': doctor['practices'][0]['visit_address']['city'],
+            'name': doctor['practices'][0]['name'],
+            'bio': doctor['profile']['bio'],
+            'specialty': 'cardiologist'
+        })
+    map_base = 'https://www.google.com/maps/place/'
+    google_map = map_base + doctor_list[0]['street'].replace(' ', '+') + '+' + doctor_list[0]['city']
+    message = 'Here is the nearest doctor who covers your insurance network.\n Bio: {} \nPhone Number: {} \nAddress: {} \nGoogle Map: {}'.format(
+        doctor_list[0]['bio'],
+        doctor_list[0]['phone'],
+        doctor_list[0]['street'] + ', ' + doctor_list[0]['name'],
+        google_map
+    )
     res = {
         "user_id": "2",
         "bot_id": "1",
         "module_id": "3",
         "message": message
     }
+    # print(insurance_name)
+    # print(uid)
+    # print(location)
+    # return jsonify(doctors)
     return jsonify(res)
     # return jsonify(doctors)
 

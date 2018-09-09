@@ -26,7 +26,7 @@ def getDoctors(name=None, firstName=None, lastName=None, query=None,
                specialty=None, insurance=None, practice=None, location=None,
                userLocation=None, gender=None, sort=None, fields=None, skip=0,
                limit=10):
-    sort = 'best-match-desc'
+    sort = 'distance-asc'
     requestDict = _makeDict(user_key=key, name=name, first_name=firstName,
                             last_name=lastName, query=query,
                             specialty_uid=specialty, insurance_uid=insurance,
