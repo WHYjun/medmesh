@@ -114,4 +114,4 @@ test.env
 win-test.bat
 
 # image
-.png
+*.png
