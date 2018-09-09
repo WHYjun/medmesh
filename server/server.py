@@ -1,5 +1,5 @@
 import fitbit
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, Response
 import logging
 import os
 import requests
@@ -85,9 +85,8 @@ def signup():
 	insurance = args['insurance']
 	age = args['age']
 	db.user.insert({'username': username,'password': pw,'insurance': insurance,'age': age})
-	response = Response()
-	response.status_code = 200
-	return response.json()
+	
+	return Response(status=200)
 
 
 @app.route('/api/user', methods=['POST'])
