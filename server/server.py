@@ -73,10 +73,6 @@ def register():
     return render_template('register.html')
 
 
-
-
-
-
 @app.route('/api/signup', methods=['POST'])
 def signup():
     username = request.form['username']
@@ -92,10 +88,42 @@ def signup():
     return response.json()
 
 
-# @app.route('/api/user/<username>', methods=['GET'])
+@app.route('/api/user', methods=['POST'])
+def get_judges():
+    user = user_data.get('Amy')
+    if not user:
+        logger.error('get_user({}): username not existed'.format(username))
+        return None
+    if os.environ.get('env') == 'demo':
+        # TODO: Get data from real cases
+        pass
+    else:
+        start = '13:00'
+        end = '13:01'
+        try:
+            heart_rates = fitbit_module.get_heartrate(start=start, end=end)
+            avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
+        except Exception as e:
+            avg_hr = 80.0
+    req = user
+    req['heart_rate'] = avg_hr
+    stroke_probability = predictionEngine.predict(
+        model, req)
+    req['stroke_probability'] = stroke_probability
+    req['visit'] = getVisitType(req)
+    res = {
+        "user_id": "2",
+        "bot_id": "1",
+        "module_id": "3",
+        "message": req['visit'],
+        "stroke_probability": stroke_probability
+    }
+    return jsonify(res)
+
+
 @app.route('/api/user/<username>', methods=['POST'])
 def get_percentage(username):
-    user = user_data.get(username) #'Amy'
+    user = user_data.get(username)  # 'Amy'
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
@@ -119,7 +147,6 @@ def get_percentage(username):
     req['heart_rate'] = avg_hr
     stroke_probability = predictionEngine.predict(
         model, req)
-    print("stroke_probability >> ", stroke_probability)
     req['stroke_probability'] = stroke_probability
     req['visit'] = getVisitType(req)
     res = {
@@ -128,7 +155,6 @@ def get_percentage(username):
         "module_id": "3",
         "message": req['visit'],
         "stroke_probability": stroke_probability
-
     }
     return jsonify(res)
 
