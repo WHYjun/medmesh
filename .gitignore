@@ -108,3 +108,7 @@ venv.bak/
 
 # logs
 logs/
+
+# windows
+test.env
+win-test.bat

@@ -1,9 +1,3 @@
-
-'''
-This prediction engine builds and trains a model on user demographic data and heart_rate to predict the probability of a stroke
-
-'''
-#visualization libraries
 import matplotlib
 import seaborn as sns
 
@@ -29,180 +23,83 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn import metrics
 from datetime import datetime, timedelta
 from sklearn.metrics import roc_auc_score
- 
+from collections import OrderedDict
 import time
 
-# Load Train and Test CSV
 def train_model():
-
-	headerNames = ["id","gender","age","hypertension","heart_disease","ever_married","work_type",
-               "residence_type","avg_glucose_level","bmi","smoking_status","stroke"]
+	'''
+	Train the model
+	'''
+	# Load Train and Test CSV
+	headerNames = ["id","Gender","age","hypertension","heart_disease","ever_married","work_type",
+	               "Residence_type","avg_glucose_level","bmi","smoking_status","stroke"]
 	prefix = "../dataset/"
 
 	# ID cannot be used for prediction 
 	# hence setting index_col = 0 takes care of removing ID field from dataset in both train and test dataframes.
 	traindf = pd.read_csv(prefix + "train.csv", header=None, delim_whitespace=False,  names=headerNames, index_col=0,) 
-	testdf = pd.read_csv(prefix + "test.csv", header=None, delim_whitespace=False,  names=headerNames, index_col=0,)
-	testdf = testdf.drop('stroke', axis=1)
 
-	#print(traindf.shape)
-	#print(testdf.shape)
-	#traindf.head(10)
+	#sample data for a quick run
+	#traindf = traindf.sample(frac=0.25, replace=True)
 
-	# gender, age, BMI to heart rate data
-	headerNames = ["gender","age","height","weight","hr_max"]
-	
+	# Gender, Age, BMI to heart rate data
+	headerNames = ["Gender","Age","Height","Weight","HR_max"]
+
 	# ID cannot be used for prediction 
 	# hence setting index_col = 0 takes care of removing ID field from dataset in both train and test dataframes.
 	hrratetraindf = pd.read_csv(prefix + "demog-max-hrrate.csv", header=None, delim_whitespace=False,  names=headerNames, ) #index_col=0, 
-	hrratetraindf['weight'] = hrratetraindf['weight'].astype(float)
+	hrratetraindf['Weight'] = hrratetraindf['Weight'].astype(float)
 
-	hrratetraindf['height'] = hrratetraindf['height'].astype(float)
-	hrratetraindf.loc[hrratetraindf['height'] > 10, 'height'] = hrratetraindf['height']/100
-	hrratetraindf['BMI'] = hrratetraindf['weight'] / (hrratetraindf['height'] * hrratetraindf['height'])
+	hrratetraindf['Height'] = hrratetraindf['Height'].astype(float)
+	hrratetraindf.loc[hrratetraindf['Height'] > 10, 'Height'] = hrratetraindf['Height']/100
 
-	#print(hrratetraindf.shape)
-	hrratetraindf.head(100)
+	hrratetraindf['BMI'] = hrratetraindf['Weight'] / (hrratetraindf['Height'] * hrratetraindf['Height'])
 
 	# Set of Unique Values for stroke - it is a binary classification problem
-	#print(traindf['gender'].unique())
+	#print(traindf['Gender'].unique())
 	#print(traindf['ever_married'].unique())
 	#print(traindf['work_type'].unique())
-	#print(traindf['residence_type'].unique())
+	#print(traindf['Residence_type'].unique())
 	#print(traindf['smoking_status'].unique())
 	#print(traindf['stroke'].unique())
 
-	traindf.columns
-
-	# Train Data Stats
-	traindf.describe()
-
-	# stats of categorical features
-	traindf.describe(include=['O'])
-
-	# for starters, fill every nan value with mean column values across the dataset.
-	#traindf = traindf.dropna() 
-	#testdf = testdf.dropna() 
-
 	#fill NaN values with 0.0 for training and test
-	traindf['bmi'].fillna(0.0, inplace=True) 
-	testdf['bmi'].fillna(0.0, inplace=True) 
+	traindf['bmi'].fillna(traindf['bmi'].dropna().mean(), inplace=True) 
 
-	#traindf['gender'].fillna(traindf['gender'].dropna().mean(), inplace=True)
+	from sklearn import preprocessing
+	#print(traindf.columns)
+	#print(traindf.columns[traindf.isnull().any()].tolist())
 
-	#print(traindf.shape)
-	#print(testdf.shape)
+	traindf['smoking_status'].fillna('never smoked', inplace=True) 
 
-	# Feature Engineering - Convert Categorical Data to Numeric > gender
-	# convert  to numeric
+	le = preprocessing.LabelEncoder()
+	traindf_cat = traindf.select_dtypes(include=[object])
+	#print(traindf_cat.columns)
+	traindf_cat = traindf_cat.astype(str).apply(le.fit_transform)
+	#print(traindf_cat.tail())
+	#print(traindf_cat.shape)
 
-	#Train Data
-	traindf['gender_numeric']  = 0.0 # default value
-	traindf.loc[traindf['gender'] == 'Male', 'gender_numeric'] = 1.0
-	traindf.loc[traindf['gender'] == 'Female', 'gender_numeric'] = 2.0
-	traindf.loc[traindf['gender'] == 'Other', 'gender_numeric'] = 3.0
-	traindf = traindf.drop('gender', axis=1)
-
-	#Test Data
-	testdf['gender_numeric']  = 0.0 # default value
-	testdf.loc[testdf['gender'] == 'Male', 'gender_numeric'] = 1.0
-	testdf.loc[testdf['gender'] == 'Female', 'gender_numeric'] = 2.0
-	testdf.loc[testdf['gender'] == 'Other', 'gender_numeric'] = 3.0
-	testdf = testdf.drop('gender', axis=1)
-
-	# Feature Engineering - Convert Categorical Data to Numeric > ever_married
-	# convert ever_married to numeric
-
-	#Train Data
-	traindf['ever_married_numeric']  = 0.0 # default value
-	traindf.loc[traindf['ever_married'] == 'No', 'ever_married_numeric'] = 1.0
-	traindf.loc[traindf['ever_married'] == 'Yes', 'ever_married_numeric'] = 2.0
-	traindf = traindf.drop('ever_married', axis=1)
-
-	#Test Data
-	testdf['ever_married_numeric']  = 0.0 # default value
-	testdf.loc[testdf['ever_married'] == 'No', 'ever_married_numeric'] = 1.0
-	testdf.loc[testdf['ever_married'] == 'Yes', 'ever_married_numeric'] = 2.0
-	testdf = testdf.drop('ever_married', axis=1)
-
-	# Feature Engineering - Convert Categorical Data to Numeric > work_type
-	# convert work_type to numeric
-	#['children' 'Private' 'Never_worked' 'Self-employed' 'Govt_job']
-
-	#Train Data
-	traindf['work_type_numeric']  = 0.0 # default value
-	traindf.loc[traindf['work_type'] == 'children', 'work_type_numeric'] = 1.0
-	traindf.loc[traindf['work_type'] == 'Private', 'work_type_numeric'] = 2.0
-	traindf.loc[traindf['work_type'] == 'Never_worked', 'work_type_numeric'] = 3.0
-	traindf.loc[traindf['work_type'] == 'Self-employed', 'work_type_numeric'] = 4.0
-	traindf.loc[traindf['work_type'] == 'Govt_job', 'work_type_numeric'] = 5.0
-	traindf = traindf.drop('work_type', axis=1)
-
-	#Test Data
-	testdf['work_type_numeric']  = 0.0 # default value
-	testdf.loc[testdf['work_type'] == 'children', 'work_type_numeric'] = 1.0
-	testdf.loc[testdf['work_type'] == 'Private', 'work_type_numeric'] = 2.0
-	testdf.loc[testdf['work_type'] == 'Never_worked', 'work_type_numeric'] = 3.0
-	testdf.loc[testdf['work_type'] == 'Self-employed', 'work_type_numeric'] = 4.0
-	testdf.loc[testdf['work_type'] == 'Govt_job', 'work_type_numeric'] = 5.0
-	testdf = testdf.drop('work_type', axis=1)
-
-	# Feature Engineering - Convert Categorical Data to Numeric > residence_type
-	# convert residence_type to numeric
-	#['Rural' 'Urban']
-
-	#Train Data
-	traindf['residence_type_numeric']  = 0.0 # default value
-	traindf.loc[traindf['residence_type'] == 'Rural', 'residence_type_numeric'] = 1.0
-	traindf.loc[traindf['residence_type'] == 'Urban', 'residence_type_numeric'] = 2.0
-	traindf = traindf.drop('residence_type', axis=1)
-
-	#Test Data
-	testdf['residence_type_numeric']  = 0.0 # default value
-	testdf.loc[testdf['residence_type'] == 'Rural', 'residence_type_numeric'] = 1.0
-	testdf.loc[testdf['residence_type'] == 'Urban', 'residence_type_numeric'] = 2.0
-	testdf = testdf.drop('residence_type', axis=1)
-
-
-	# In[14]:
-
-
-
-	# Feature Engineering - Convert Categorical Data to Numeric > smoking_status
-	# convert smoking_status to numeric
-	#[nan 'never smoked' 'formerly smoked' 'smokes']
-
-	#Train Data
-	traindf['smoking_status_numeric']  = 0.0 # default value
-	traindf.loc[traindf['smoking_status'] == 'never smoked', 'smoking_status_numeric'] = 1.0
-	traindf.loc[traindf['smoking_status'] == 'formerly smoked', 'smoking_status_numeric'] = 2.0
-	traindf.loc[traindf['smoking_status'] == 'smokes', 'smoking_status_numeric'] = 3.0
-	traindf = traindf.drop('smoking_status', axis=1)
-
-	#Test Data
-	testdf['smoking_status_numeric']  = 0.0 # default value
-	testdf.loc[testdf['smoking_status'] == 'never smoked', 'smoking_status_numeric'] = 1.0
-	testdf.loc[testdf['smoking_status'] == 'formerly smoked', 'smoking_status_numeric'] = 2.0
-	testdf.loc[testdf['smoking_status'] == 'smokes', 'smoking_status_numeric'] = 3.0
-	testdf = testdf.drop('smoking_status', axis=1)
-	#print(testdf['smoking_status_numeric'].unique())
-
-
-	# In[15]:
-
-
-	# convert integer based columns to float
+	traindf['Gender'] = traindf_cat['Gender'].astype(float)
+	traindf['ever_married'] = traindf_cat['ever_married'].astype(float)
+	traindf['work_type'] = traindf_cat['work_type'].astype(float)
+	traindf['Residence_type'] = traindf_cat['Residence_type'].astype(float)
+	traindf['smoking_status'] = traindf_cat['smoking_status'].astype(float)
 	traindf['hypertension'] = traindf['hypertension'].astype(float)
-	traindf['heart_disease'] = traindf['heart_disease'].astype(float)
 	traindf['stroke'] = traindf['stroke'].astype(float)
+	traindf['heart_disease'] = traindf['heart_disease'].astype(float)
 
-	testdf['hypertension'] = testdf['hypertension'].astype(float)
-	testdf['heart_disease'] = testdf['heart_disease'].astype(float)
+	#print(traindf.tail())
+
+	enc = preprocessing.OneHotEncoder()
+	enc.fit(traindf_cat)
+	onehotlabels = enc.transform(traindf_cat).toarray()
+	#print(onehotlabels.shape)
+	#print(onehotlabels)
+
+	hrratetraindf['Weight'].astype(float)
 
 	# removing glucose level - not collecting data real time
 	traindf = traindf.drop('avg_glucose_level', axis=1)
-	testdf = testdf.drop('avg_glucose_level', axis=1)
-
 
 	fig=plt.gcf()
 	traindf.hist(figsize=(18, 16), alpha=0.5, bins=50)
@@ -215,48 +112,26 @@ def train_model():
 	#plt.show()
 	fig.savefig('Correlation_before.png')
 
-
-	sns.heatmap(traindf.corr(),annot=True,cmap='RdYlGn',linewidths=0.2) #data.corr()-->correlation matrix
-	fig=plt.gcf()
-	fig.set_size_inches(20,16)
-	#plt.show()
-	fig.savefig('Correlation_after.png')
-
-
-	# extract features from training set - all columns except 'stroke'
-	train_features = traindf.loc[:, traindf.columns != 'stroke']
-	print(train_features.columns)
-
-	# extract label from training set - Approved
-	train_label = traindf.loc[:, traindf.columns == 'stroke']
-	train_label.columns
-
 	# check for null valued columns
 	#print("Train Data -any null ?? ")
 	#print(traindf.columns[traindf.isnull().any()].tolist())
-	#print("Test Data -any null ?? ")
-	#print(testdf.columns[testdf.isnull().any()].tolist())
-	#check test columns
-	#print(testdf.columns)
-
 
 	## Prediction model 
 	#print(hrratetraindf.columns)
-	hr_train_features = hrratetraindf.loc[:, hrratetraindf.columns != 'hr_max']
-	hr_train_features= hr_train_features.drop('height',axis=1)
-	hr_train_features= hr_train_features.drop('weight',axis=1)
+	hr_train_features = hrratetraindf.loc[:, hrratetraindf.columns != 'HR_max']
+	hr_train_features= hr_train_features.drop('Height',axis=1)
+	hr_train_features= hr_train_features.drop('Weight',axis=1)
 
-	hr_train_features['gender'] = hr_train_features['gender'].astype(float)
-	hr_train_features['age'] = hr_train_features['age'].astype(float)
+	hr_train_features['Gender'] = hr_train_features['Gender'].astype(float)
+	hr_train_features['Age'] = hr_train_features['Age'].astype(float)
 
 	#print(hr_train_features.columns)
 	#print(hr_train_features.head(10))
 	# extract label from training set - Approved
-	hr_train_label = hrratetraindf.loc[:, hrratetraindf.columns == 'hr_max']
-	hr_train_label['hr_max'] = hr_train_label['hr_max'].astype(float)
+	hr_train_label = hrratetraindf.loc[:, hrratetraindf.columns == 'HR_max']
+	hr_train_label['HR_max'] = hr_train_label['HR_max'].astype(float)
 	#print(hr_train_label.columns)
-	
-	hr_train_label['hr_max'].fillna(hr_train_label['hr_max'].dropna().mean(), inplace=True)
+	hr_train_label['HR_max'].fillna(hr_train_label['HR_max'].dropna().mean(), inplace=True)
 
 	# check for null valued columns
 	#print("Train Data -any null ?? ")
@@ -275,34 +150,55 @@ def train_model():
 	hr_model.fit(hr_train_features, hr_train_label)
 	hr_train_pred = hr_model.predict(hr_train_features)
 	#print(hr_train_pred)
-	print ("HR RMSE :: " , np.sqrt(mean_squared_error(hr_train_label, hr_train_pred))) # Training RMSE
+	print ("RMSE :: " , np.sqrt(mean_squared_error(hr_train_label, hr_train_pred))) # Training RMSE
+
 
 	## predict hr rate for original training data and plug it into training data
-	print("train columns ",train_features.columns)
-	hr_train_features = train_features
+	hr_train_features = traindf
 	hr_train_features= hr_train_features.drop('hypertension', axis=1)
 	hr_train_features= hr_train_features.drop('heart_disease', axis=1)
-	hr_train_features= hr_train_features.drop('ever_married_numeric', axis=1)
+	hr_train_features= hr_train_features.drop('ever_married', axis=1)
 
-	hr_train_features= hr_train_features.drop('work_type_numeric', axis=1)
-	hr_train_features= hr_train_features.drop('smoking_status_numeric', axis=1)
-	hr_train_features= hr_train_features.drop('residence_type_numeric', axis=1)
+	hr_train_features= hr_train_features.drop('work_type', axis=1)
+	hr_train_features= hr_train_features.drop('smoking_status', axis=1)
+	hr_train_features= hr_train_features.drop('Residence_type', axis=1)
 
-	print("hr train columns ",hr_train_features.columns)
+	hr_train_features= hr_train_features.drop('stroke', axis=1)
 
-	train_features['predicted_hr_max']=hr_model.predict(hr_train_features)
+	#print("hr train ",hr_train_features.columns)
 
-	traindf['heart_rate'] = train_features['predicted_hr_max']
-	traindf.loc[traindf['stroke'] == 0.0, 'heart_rate'] = train_features['predicted_hr_max'] - 70; # normal is less than 120
+	traindf['predicted_hr_max'] =hr_model.predict(hr_train_features)
+	#print(traindf['predicted_hr_max'])
+	traindf.loc[traindf['stroke'] == 0.0, 'hr'] = traindf['predicted_hr_max'] - 70 # normal is less than 120
+	traindf.loc[traindf['stroke'] == 1.0, 'hr'] = traindf['predicted_hr_max']  # normal is less than 120
+
+	traindf = traindf.drop('predicted_hr_max', axis=1)
+
+	sns.heatmap(traindf.corr(),annot=True,cmap='RdYlGn',linewidths=0.2) #data.corr()-->correlation matrix
+	fig=plt.gcf()
+	fig.set_size_inches(20,16)
+	#plt.show()
+	fig.savefig('Correlation_after.png')
 
 
-	train_features['heart_rate'] = traindf['heart_rate']
-	train_features = train_features.drop('predicted_hr_max', axis=1)
+
+	# extract features from training set - all columns except 'stroke'
+	train_features = traindf.loc[:, traindf.columns != 'stroke']
+	stroked = traindf.loc[traindf['stroke'] == 1]
+	#print(stroked)
 	#print(train_features.columns)
-	print(train_features.columns)
+	# extract label from training set - Approved
+	train_label = traindf.loc[:, traindf.columns == 'stroke']
+	#print(train_label.columns)
 
-	#traindf.head(10)
+	#train_features.head(10)
+	#traindf.to_csv("output/traindf"+str(time.time())+".csv", sep=",", index=False)
 
+	train_features=train_features.drop('Gender',axis=1)
+	train_features=train_features.drop('Residence_type',axis=1)
+	train_features=train_features.drop('smoking_status',axis=1)
+	train_features=train_features.drop('ever_married',axis=1)
+	train_features=train_features.drop('work_type',axis=1)
 
 	#Train the model with best parameters of RF
 	# best params for RF using randomizedCV
@@ -320,21 +216,30 @@ def train_model():
 	print (np.sqrt(mean_squared_error(train_label, train_pred))) # Training RMSE
 	print(roc_auc_score(train_label, train_pred)) # AUC-ROC values
 
-
 	#print(train_features.columns)
-	#print(testdf.columns)print
+	#train_features.to_csv("output/train_features"+str(time.time())+".csv", sep=",", index=False)
+	#print(np.count_nonzero(train_pred))
+
 	return model
+
 
 def predict(model, input_dict):
 	'''
 	Pass the reference of the model
 	and a single user data to make the prediction
 	'''
-	print(input_dict)
-	testdata = pd.DataFrame([input_dict])
+	#print(input_dict)
+	testdata = pd.DataFrame([OrderedDict(input_dict)])
+
+	testdata=testdata.drop('gender_numeric',axis=1)
+	testdata=testdata.drop('smoking_status_numeric',axis=1)
+	testdata=testdata.drop('ever_married_numeric',axis=1)
+	testdata=testdata.drop('work_type_numeric',axis=1)
+	testdata=testdata.drop('residence_type_numeric',axis=1)
 	#Predict with test data - predict probabilities
 	test_pred = model.predict_proba(testdata) #test features are all in testdf
 
+	print("model.classes_ :: ",model.classes_)
 	print("****************************************************************************************")
 	print("Predicted Output [probability of No Stroke, probability of Stroke]  >>>>>>>>> ",test_pred) # Predicted Values
 	print("****************************************************************************************")
@@ -349,6 +254,9 @@ if __name__=="__main__":
 	'''input ={'age':'30.0', 'hypertension': '0.0', 'heart_disease':'0.0', 'bmi':'26.5', 'gender_numeric':1.0,
    	'ever_married_numeric':'1.0', 'work_type_numeric':'1.0', 'residence_type_numeric':'1.0',
    	'smoking_status_numeric':'0.0', 'heart_rate':'120.4'}'''
-	input = {'age':30.0, 'hypertension': 0.0, 'heart_disease':0.0, 'bmi':26.5, 'gender_numeric':1.0,'ever_married_numeric':1.0, 'work_type_numeric':1.0, 'residence_type_numeric':1.0,'smoking_status_numeric':0.0, 'heart_rate':220.4}
+	input = {'gender_numeric':1.0,'age':67.0, 'hypertension': 0.0, 'heart_disease':1.0, 'ever_married_numeric':1.0,'work_type_numeric':2.0,'residence_type_numeric':1.0,'bmi':36.6,   'smoking_status_numeric':0.0, 'heart_rate':138.944837386115}
+	
+	
 	model = train_model()
 	predict(model, input)
+
