@@ -1,5 +1,14 @@
 body {
-  background-image: url(https://wallpapertag.com/wallpaper/full/c/a/a/157415-simplistic-wallpapers-1920x1080-lockscreen.jpg);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-image: url('../img/medmesh-bkgrnd-t.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100%;
+    opacity: 1.0;
+    filter:alpha(opacity=10);
 }
 #login-name {
   font-size: 65px;
