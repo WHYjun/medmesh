@@ -33,36 +33,36 @@ db = client.heartcare
 # User Data
 user_data = {
     'Amy': {
-        'age': 58.0,
+        'age': 38.0,
         'hypertension': 1.0,
         'heart_disease': 1.0,
         'bmi': 38.0,
         'gender_numeric': 2.0,
         'ever_married_numeric': 1.0,
         'work_type_numeric': 1.0,
-        'residence_numeric': 2.0,
+        'residence_type_numeric': 2.0,
         'smoking_status_numeric': 1.0
     },
     'Bob': {
-        'age': 58.0,
-        'hypertension': 1.0,
+        'age': 78.0,
+        'hypertension': 0.0,
         'heart_disease': 1.0,
-        'bmi': 38.0,
+        'bmi': 41.0,
         'gender_numeric': 2.0,
         'ever_married_numeric': 1.0,
         'work_type_numeric': 1.0,
-        'residence_numeric': 2.0,
+        'residence_type_numeric': 2.0,
         'smoking_status_numeric': 1.0
     },
     'Charlie': {
-        'age': 58.0,
-        'hypertension': 1.0,
+        'age': 67.0,
+        'hypertension': 0.0,
         'heart_disease': 1.0,
         'bmi': 38.0,
-        'gender_numeric': 2.0,
+        'gender_numeric': 1.0,
         'ever_married_numeric': 1.0,
-        'work_type_numeric': 1.0,
-        'residence_numeric': 2.0,
+        'work_type_numeric': 2.0,
+        'residence_type_numeric': 1.0,
         'smoking_status_numeric': 1.0
     }
 }
@@ -93,9 +93,9 @@ def signup():
 
 
 # @app.route('/api/user/<username>', methods=['GET'])
-@app.route('/api/user', methods=['POST'])
-def get_percentage():
-    user = user_data.get('Amy')
+@app.route('/api/user/<username>', methods=['POST'])
+def get_percentage(username):
+    user = user_data.get(username) #'Amy'
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
@@ -109,7 +109,12 @@ def get_percentage():
             heart_rates = fitbit_module.get_heartrate(start=start, end=end)
             avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
         except Exception as e:
-            avg_hr = 80.00
+            if username == 'Charlie':
+                avg_hr = 140.00
+            elif username == 'Bob':
+                avg_hr = 120.00
+            else:
+                avg_hr = 90.00
     req = user
     req['heart_rate'] = avg_hr
     stroke_probability = predictionEngine.predict(
@@ -165,7 +170,9 @@ def calculate_hr(heart_rates):
 
 
 def getVisitType(req):
-    if req['stroke_probability'] < 0.4:
+    if req['stroke_probability'] < 0.20:
+        return "Heart Healthy"
+    elif req['stroke_probability'] >= 0.20 and req['stroke_probability'] < 0.4:
         return "Primary Care"
     elif req['stroke_probability'] >= 0.4 and req['stroke_probability'] < 0.7:
         return "Urgent Care"
