@@ -100,7 +100,8 @@ def signup():
     print("captured inputs.. about to insert into db")
     db.user.insert({'username': username,'password': pw, 'insurance': insurance,'age': age, 'height':height, 'weight':weight, 'gender': gender,'married': married, 'hypertension': hypertension,'heartdisease': heartdisease, 'smoking': smoking,'worktype': worktype, 'residencetype': residencetype,'state':state, 'city':city })
 
-    return Response(status=200)
+    return render_template('homepage.html')
+    #return Response(status=200)
 
 @app.route('/api/user', methods=['POST'])
 def get_judges():
