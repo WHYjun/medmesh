@@ -122,12 +122,13 @@ def get_judges():
     if not user:
         logger.error('get_user({}): username not existed'.format(username))
         return None
-    start = '13:00'
-    end = '13:01'
+    start = str(datetime.datetime.time(datetime.datetime.now()-datetime.timedelta(minutes=1)))[0:5]
+    end = str(datetime.datetime.time(datetime.datetime.now()))[0:5]
     try:
         heart_rates = fitbit_module.get_heartrate(start=start, end=end)
         avg_hr = calculate_hr(heart_rates['activities-heart-intraday'])
     except Exception as e:
+        logger.error("fitbit_module doesn't work from {} to {}".format(start, end))
         avg_hr = 80.0
     req = user
     req['heart_rate'] = avg_hr

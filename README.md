@@ -1,5 +1,9 @@
 # Medmesh
 
+## PennApps
+
+Medmesh was awarded Top 30 Hack out ot 201 teams at PennApps18. [(Devpost)](https://devpost.com/software/heartcare-sjzvte)
+
 ## Problem to Solve
 
 Atrial fibrillation, the most common abnormal heart rhythm, causes 1 in 4 strokes. Two-thirds of those types of strokes are preventable with relatively inexpensive drugs. More people, including older populations most prone to stroke risk, are starting to use wearable technology such as Fitbit or the Apple Watch, which can monitor heart rate and track the daily activity.
